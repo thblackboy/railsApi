@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  get 'urls/index'
   get 'urls/:short_link', to: 'urls#show'
   get 'urls/:short_link/stats', to: 'urls#stats'
   post 'urls/:link', to: 'urls#create'
