@@ -2,23 +2,23 @@ require "digest"
 class UrlsController < ApplicationController
   def index
     urls=Weblink.all
-    render json:urls
+    render json:urls,status:200
   end
   def create
     weblink = Weblink.new(site_params)
-    shortlink =Digest::MD5.hexdigest(weblink.to_s)[0..7]
-    i=0
-    while !(Weblink.find_by_short_link(shortlink).nil?) do
+      shortlink =Digest::MD5.hexdigest(weblink.link.to_s)[0..7]
+      i=0
+      while !(Weblink.find_by_short_link(shortlink).nil?) do
       i+=1
-      shortlink=(Digest::MD5.hexdigest(weblink.to_s+i)[0..7])
-    end
-    weblink.short_link=shortlink
-    weblink.click_count=0
-    if weblink.save
-      render json: {short_link:weblink.short_link},status:201
-    else
-      render json: {message:'Create Error'},status:400
-    end
+      shortlink=(Digest::MD5.hexdigest(weblink.link.to_s+i)[0..7])
+      end
+      weblink.short_link=shortlink
+      weblink.click_count=0
+      if weblink.save
+        render json: {short_link:weblink.short_link},status:201
+      else
+      render status:400
+      end
   end
 
   def show
@@ -32,7 +32,7 @@ class UrlsController < ApplicationController
       if weblink.save
              render json: {link:weblink.link},status:200
       else
-          render json: {message:'Save Error'},status:400
+          render status:400
       end
 
     end
@@ -50,6 +50,7 @@ class UrlsController < ApplicationController
   end
 
 
+  private
   def site_params
     params.require(:urls).permit(:link)
 
